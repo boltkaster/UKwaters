@@ -129,7 +129,7 @@ dim_watercourse obsahuje informácie o vodných tokoch vrátane názvu toku, alt
 
 Príklad kódu pre vytvorenie dimenzií:
 ```sql
-\-- Dimension: Hydro Node
+-- Dimension: Hydro Node
 CREATE OR REPLACE TABLE UK_WATERS.dim_hydro_node AS
 SELECT DISTINCT
 ID AS dim_hydro_node_id,
@@ -138,7 +138,7 @@ GEOMETRY,
 GEOGRAPHY
 FROM UK_WATERS.HYDRO_NODE_RAW;
 
-\-- Dimension: Watercourse
+-- Dimension: Watercourse
 CREATE OR REPLACE TABLE UK_WATERS.dim_watercourse AS
 SELECT DISTINCT
 ID AS dim_watercourse_id,
@@ -149,14 +149,14 @@ FLOW_DIRECTION,
 LENGTH
 FROM UK_WATERS.WATERCOURSE_LINK_RAW;
 
-\-- Dimension: Flow Direction
+-- Dimension: Flow Direction
 CREATE OR REPLACE TABLE UK_WATERS.dim_flow_direction AS
 SELECT DISTINCT
     flow_direction AS flow_dir_id,
     flow_direction
 FROM UK_WATERS.watercourse_link_raw;
 
-\-- Dimension: Length Bucket
+-- Dimension: Length Bucket
 CREATE OR REPLACE TABLE UK_WATERS.dim_length_bucket AS
 SELECT DISTINCT
     ROW_NUMBER() OVER (ORDER BY length) AS length_id,
