@@ -213,7 +213,7 @@ Ukazuje počet vodných úsekov v smere „in direction" vs. „opposite directi
 ```sql
 SELECT
 f.flow_direction,
-COUNT(\*) AS total_links
+COUNT(*) AS total_links
 FROM UK_WATERS.fact_watercourse_links f
 GROUP BY f.flow_direction
 ORDER BY total_links DESC;
@@ -239,7 +239,7 @@ Ukazuje, koľko vodných tokov začína v jednotlivých typoch hydrologických u
 ```sql
 SELECT
 n.hydro_node_category,
-COUNT(\*) AS total_links
+COUNT(*) AS total_links
 FROM UK_WATERS.fact_watercourse_links f
 JOIN UK_WATERS.dim_hydro_node n
 ON f.start_node_id = n.hydro_node_id
@@ -253,7 +253,7 @@ Analyzuje typy vodných tokov podľa ich formy (napr. rieka, potok) a poskytuje 
 ```sql
 SELECT
 w.form,
-COUNT(\*) AS total_links
+COUNT(*) AS total_links
 FROM UK_WATERS.fact_watercourse_links f
 JOIN UK_WATERS.dim_watercourse w
 ON f.dim_watercourse_id = w.watercourse_id
