@@ -92,10 +92,10 @@ Dáta zo zdrojového datasetu "Watercourses, Water Bodies, Rivers - Great Britai
 
 ```sql
 CREATE OR REPLACE TABLE HYDRO_NODE_RAW AS
-SELECT \*
+SELECT *
 FROM HIPPO_UK_WATERS_DB.PRS_OPENRIVERS_SCH.PRS_HYDRO_NODE_VW;
 CREATE OR REPLACE TABLE WATERCOURSE_LINK_RAW AS
-SELECT \*
+SELECT *
 FROM HIPPO_UK_WATERS_DB.PRS_OPENRIVERS_SCH.PRS_WATERCOURSE_LINK_VW;
 ```
 Tieto staging tabuľky obsahujú všetky pôvodné atribúty zo zdrojového datasetu vrátane identifikátorov, kategórií, geometrie a geografickej polohy pre hydrologické uzly, a informácie o vodných tokoch vrátane názvov, alternatívnych názvov, typu toku, smeru toku a dĺžky.
@@ -111,10 +111,10 @@ Príklad kódu pre vytvorenie novej schémy a načítanie do staging vrstvy:
 CREATE OR REPLACE SCHEMA UK_WATERS;
 CREATE OR REPLACE TABLE UK_WATERS.HYDRO_NODE_RAW AS
 
-SELECT \*
+SELECT *
 FROM HIPPO_UK_WATERS_DB.PRS_OPENRIVERS_SCH.PRS_HYDRO_NODE_VW;
 CREATE OR REPLACE TABLE UK_WATERS.WATERCOURSE_LINK_RAW AS
-SELECT \*
+SELECT *
 FROM HIPPO_UK_WATERS_DB.PRS_OPENRIVERS_SCH.PRS_WATERCOURSE_LINK_VW;
 ```
 **3.3 Transformácia dát**
@@ -267,7 +267,7 @@ Zobrazuje 10 vodných tokov, ktoré majú najviac prepojení medzi hydrologický
 ```sql
 SELECT
 w.watercourse_name AS watercourse,
-COUNT(\*) AS total_links
+COUNT(*) AS total_links
 FROM UK_WATERS.fact_watercourse_links f
 JOIN UK_WATERS.dim_watercourse w
 ON f.dim_watercourse_id = w.watercourse_id
