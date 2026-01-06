@@ -90,7 +90,6 @@ Dáta zo zdrojového datasetu "Watercourses, Water Bodies, Rivers - Great Britai
 
 **Príklad kódu:**
 
-\-- Staging tabuľky pre hydrologické uzly a vodné toky
 ```sql
 CREATE OR REPLACE TABLE HYDRO_NODE_RAW AS
 SELECT \*
@@ -109,9 +108,7 @@ Po extrahovaní dát som ich načítal do Snowflake tabuľky UK_WATERS (nová sc
 
 Príklad kódu pre vytvorenie novej schémy a načítanie do staging vrstvy:
 ```sql
-\-- Vytvorenie schémy pre finálne tabuľky
 CREATE OR REPLACE SCHEMA UK_WATERS;
-\-- Skopírovanie dát zo zdrojových view
 CREATE OR REPLACE TABLE UK_WATERS.HYDRO_NODE_RAW AS
 
 SELECT \*
@@ -132,8 +129,7 @@ dim_watercourse obsahuje informácie o vodných tokoch vrátane názvu toku, alt
 
 Príklad kódu pre vytvorenie dimenzií:
 ```sql
-\-- Dimenzia hydrologických uzlov
-
+\-- Dimension: Hydro Node
 CREATE OR REPLACE TABLE UK_WATERS.dim_hydro_node AS
 SELECT DISTINCT
 ID AS dim_hydro_node_id,
@@ -142,7 +138,7 @@ GEOMETRY,
 GEOGRAPHY
 FROM UK_WATERS.HYDRO_NODE_RAW;
 
-\-- Dimenzia vodných tokov
+\-- Dimension: Watercourse
 CREATE OR REPLACE TABLE UK_WATERS.dim_watercourse AS
 SELECT DISTINCT
 ID AS dim_watercourse_id,
@@ -152,23 +148,41 @@ FORM AS watercourse_type,
 FLOW_DIRECTION,
 LENGTH
 FROM UK_WATERS.WATERCOURSE_LINK_RAW;
+
+\-- Dimension: Flow Direction
+CREATE OR REPLACE TABLE UK_WATERS.dim_flow_direction AS
+SELECT DISTINCT
+    flow_direction AS flow_dir_id,
+    flow_direction
+FROM UK_WATERS.watercourse_link_raw;
+
+\-- Dimension: Length Bucket
+CREATE OR REPLACE TABLE UK_WATERS.dim_length_bucket AS
+SELECT DISTINCT
+    ROW_NUMBER() OVER (ORDER BY length) AS length_id,
+    CASE 
+        WHEN length < 500 THEN 'Short'
+        WHEN length BETWEEN 500 AND 2000 THEN 'Medium'
+        ELSE 'Long'
+    END AS length_bucket
+FROM UK_WATERS.watercourse_link_raw;
 ```
 Faktovú tabuľku som vytvoril tak, aby obsahovala prepojenia medzi vodnými tokmi a ich začiatkom a koncom v hydrologických uzloch. Zároveň som do tabuľky zahrnul hlavné metriky toku, ako je jeho dĺžka a smer. Pre vyhodnotenie poradia som použil window funkciu RANK(), ktorá zoradila vodné toky podľa dĺžky v rámci jednotlivých smerov toku.
 
 Príklad kódu pre faktovú tabuľku:
 ```sql
 CREATE OR REPLACE TABLE UK_WATERS.fact_watercourse_links AS
-SELECT
-ID AS fact_link_id,
-LENGTH,
-START_NODE,
-END_NODE,
-d.dim_watercourse_id,
-FLOW_DIRECTION,
-RANK() OVER (PARTITION BY FLOW_DIRECTION ORDER BY LENGTH DESC) AS rank_by_length
-FROM UK_WATERS.WATERCOURSE_LINK_RAW w
-JOIN UK_WATERS.dim_watercourse d
-ON w.ID = d.dim_watercourse_id;
+SELECT 
+    f.id AS fact_link_id,
+    f.id AS link_id,
+    f.start_node AS start_node_id,
+    f.end_node AS end_node_id,
+    f.id AS dim_watercourse_id,
+    f.flow_direction AS dim_flow_dir_id,
+    ROW_NUMBER() OVER (PARTITION BY f.id ORDER BY f.length DESC) AS dim_length_id,
+    f.length,
+    RANK() OVER (PARTITION BY f.start_node ORDER BY f.length DESC) AS rank_by_length
+FROM UK_WATERS.watercourse_link_raw f;
 ```
 ---
 
