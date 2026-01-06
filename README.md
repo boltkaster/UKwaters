@@ -1,6 +1,6 @@
 ## **1\. Úvod a popis zdrojových dát**
 
-V tomto projekte analyzujeme dáta o **riečnej sieti Spojeného kráľovstva**, konkrétne údaje o **hydrologických uzloch** a **vodných tokoch**, ktoré tieto uzly prepájajú. Cieľom analýzy je lepšie porozumieť:
+V tomto projekte analyzujem dáta o **riečnej sieti Spojeného kráľovstva**, konkrétne údaje o **hydrologických uzloch** a **vodných tokoch**, ktoré tieto uzly prepájajú. Cieľom analýzy je lepšie porozumieť:
 
 - štruktúre a prepojeniu riečnych systémov,
 - vzťahom medzi hydrologickými uzlami,
